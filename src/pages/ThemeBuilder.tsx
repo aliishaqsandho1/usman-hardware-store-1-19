@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { 
   ArrowRight, ArrowLeft, Palette, Type, Frame, Globe, 
   MessageCircle, Bot, Magnet, User, Loader2, CheckCircle,
-  Copy, Eye
+  Copy, Eye, Download
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -22,6 +22,10 @@ const ThemeBuilder = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiResponse, setAiResponse] = useState(null);
   const [showRawJson, setShowRawJson] = useState(false);
+  const [themeGenerationResult, setThemeGenerationResult] = useState<{
+    themeId: string;
+    downloadUrl: string;
+  } | null>(null);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -372,7 +376,112 @@ const ThemeBuilder = () => {
     'TikTok', 'Pinterest', 'Snapchat', 'WhatsApp', 'Telegram'
   ];
 
-  // Generate AI Analysis Function
+  // Generate Theme using localhost API
+  const generateTheme = async () => {
+    setIsGenerating(true);
+    
+    try {
+      // Prepare data in the exact format your API expects
+      const themeData = {
+        basicInfo: {
+          websiteName: formData.websiteName,
+          websiteType: formData.websiteType,
+          industry: formData.industry,
+          targetAudience: formData.targetAudience,
+          businessDescription: formData.businessDescription
+        },
+        designPreferences: {
+          designStyle: formData.designStyle,
+          colorScheme: formData.colorScheme,
+          selectedTheme: formData.selectedTheme ? themeSamples.find(t => t.id === formData.selectedTheme)?.name : null,
+          fontPairing: formData.fontPairing,
+          brandColors: formData.brandColors
+        },
+        selectedFeatures: formData.selectedFeatures,
+        layoutStructure: {
+          layoutStyle: formData.layoutStyle,
+          headerStyle: formData.headerStyle,
+          footerStyle: formData.footerStyle,
+          animationStyle: formData.animationStyle,
+          contentSections: formData.contentSections
+        },
+        businessDetails: {
+          goals: formData.goals,
+          budget: formData.budget,
+          timeline: formData.timeline,
+          existingWebsite: formData.existingWebsite
+        },
+        contactAndSocial: {
+          contactInfo: formData.contactInfo,
+          socialMedia: formData.socialMedia,
+          additionalRequirements: formData.additionalRequirements
+        }
+      };
+
+      console.log('Sending theme data:', JSON.stringify(themeData, null, 2));
+
+      // Make API call to localhost
+      const response = await fetch('http://localhost:3000/api/themes/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(themeData)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Theme generation result:', result);
+
+      setThemeGenerationResult({
+        themeId: result.themeId,
+        downloadUrl: result.downloadUrl
+      });
+
+      toast({
+        title: "🎉 Theme Generated Successfully!",
+        description: "Your custom theme has been created and is ready for download.",
+        duration: 5000,
+      });
+
+    } catch (error) {
+      console.error('Error generating theme:', error);
+      toast({
+        title: "❌ Theme Generation Failed",
+        description: "Failed to generate theme. Please check if the server is running on localhost:3000.",
+        variant: "destructive",
+        duration: 5000,
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // Download theme function
+  const downloadTheme = () => {
+    if (themeGenerationResult) {
+      const downloadUrl = `http://localhost:3000${themeGenerationResult.downloadUrl}`;
+      
+      // Create a temporary anchor element to trigger download
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = ''; // Let the server determine the filename
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast({
+        title: "📥 Download Started",
+        description: "Your theme download has started.",
+        duration: 3000,
+      });
+    }
+  };
+
+  // Generate AI Analysis Function (keeping existing)
   const generateAIAnalysis = async () => {
     setIsGenerating(true);
     
@@ -1034,7 +1143,7 @@ const ThemeBuilder = () => {
               </div>
             )}
 
-            {/* Step 5: Final Details with AI Integration */}
+            {/* Step 5: Final Details with Theme Generation */}
             {currentStep === 5 && (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1176,9 +1285,84 @@ const ThemeBuilder = () => {
                   </div>
                 </div>
 
-                {/* AI Analysis Section */}
+                {/* Theme Generation Section */}
+                <div className="mt-8 p-6 bg-gradient-to-r from-green-500/10 to-blue-500/10 rounded-lg border border-green-500/20">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-green-400 flex items-center gap-2">
+                      <Bot className="w-5 h-5" />
+                      Generate Your Custom Theme
+                    </h3>
+                    <Button
+                      onClick={generateTheme}
+                      disabled={isGenerating || !formData.websiteName}
+                      className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
+                    >
+                      {isGenerating ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <Bot className="w-4 h-4 mr-2" />
+                          Generate Theme
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  
+                  {!themeGenerationResult && !isGenerating && (
+                    <p className="text-gray-400 text-sm">
+                      Click "Generate Theme" to create your custom website theme. 
+                      The theme will be generated based on all your specifications and will be available for download.
+                    </p>
+                  )}
+
+                  {themeGenerationResult && (
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2 text-green-400">
+                        <CheckCircle className="w-5 h-5" />
+                        <span className="font-medium">Theme Generated Successfully!</span>
+                      </div>
+
+                      <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-4 border border-gray-700">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <span className="font-medium text-white">Theme ID:</span>
+                            <span className="text-gray-400 ml-2">{themeGenerationResult.themeId}</span>
+                          </div>
+                          <div>
+                            <span className="font-medium text-white">Status:</span>
+                            <span className="text-green-400 ml-2">Ready for Download</span>
+                          </div>
+                        </div>
+                        
+                        <div className="mt-4 flex gap-3">
+                          <Button
+                            onClick={downloadTheme}
+                            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                          >
+                            <Download className="w-4 h-4 mr-2" />
+                            Download Theme
+                          </Button>
+                          
+                          <Button
+                            variant="outline"
+                            onClick={() => copyToClipboard(`Theme ID: ${themeGenerationResult.themeId}\nDownload URL: http://localhost:3000${themeGenerationResult.downloadUrl}`)}
+                            className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                          >
+                            <Copy className="w-4 h-4 mr-2" />
+                            Copy Details
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* AI Analysis Section (keeping existing) */}
                 <div className="mt-8 p-6 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-lg border border-purple-500/20">
-                  <div className=" mb-4">
+                  <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-purple-400 flex items-center gap-2">
                       <Bot className="w-5 h-5" />
                       AI Analysis & Recommendations
@@ -1186,20 +1370,18 @@ const ThemeBuilder = () => {
                     <Button
                       onClick={generateAIAnalysis}
                       disabled={isGenerating}
-                      className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700
-                        whitespace-normal text-sm px-3 py-2
-                        w-full max-w-xs md:w-auto md:max-w-none md:px-4 md:py-2"
-                      style={{wordBreak: 'break-word'}}
+                      variant="outline"
+                      className="border-purple-500 text-purple-300 hover:bg-purple-500/10"
                     >
                       {isGenerating ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          <span className="truncate">Analyzing...</span>
+                          Analyzing...
                         </>
                       ) : (
                         <>
                           <Bot className="w-4 h-4 mr-2" />
-                          <span className="truncate">Generate AI Analysis</span>
+                          Generate AI Analysis
                         </>
                       )}
                     </Button>
@@ -1207,8 +1389,7 @@ const ThemeBuilder = () => {
                   
                   {!aiResponse && !isGenerating && (
                     <p className="text-gray-400 text-sm">
-                      Click "Generate AI Analysis" to get a comprehensive analysis of your theme requirements, 
-                      professional recommendations, and a detailed summary for your development team.
+                      Generate an AI analysis of your theme requirements for professional recommendations and insights.
                     </p>
                   )}
 
@@ -1285,15 +1466,6 @@ const ThemeBuilder = () => {
                           </div>
                         </div>
                       )}
-
-                      {/* Next Steps */}
-                      <div className="bg-gradient-to-r from-green-500/10 to-blue-500/10 rounded-lg p-4 border border-green-500/20">
-                        <h4 className="font-semibold text-green-400 mb-2">✨ Ready for Development!</h4>
-                        <p className="text-gray-300 text-sm">
-                          Your theme requirements have been analyzed and are ready to be sent to the development team. 
-                          All data has been collected and formatted for seamless integration into your project workflow.
-                        </p>
-                      </div>
                     </div>
                   )}
                 </div>
@@ -1324,16 +1496,38 @@ const ThemeBuilder = () => {
                 <Button
                   className="flex items-center space-x-2 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
                   onClick={() => {
-                    console.log('Theme Configuration:', formData);
-                    toast({
-                      title: "🎉 Theme Created Successfully!",
-                      description: "Your custom theme configuration is ready for development.",
-                      duration: 5000,
-                    });
+                    if (!themeGenerationResult) {
+                      generateTheme();
+                    } else {
+                      toast({
+                        title: "🎉 Theme Ready!",
+                        description: "Your theme has been generated. Use the download button above to get your files.",
+                        duration: 5000,
+                      });
+                    }
                   }}
+                  disabled={!formData.websiteName || isGenerating}
                 >
-                  <span>Create Theme</span>
-                  <ArrowRight size={16} />
+                  {!themeGenerationResult ? (
+                    <>
+                      {isGenerating ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          <span>Generating Theme...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Generate Theme</span>
+                          <ArrowRight size={16} />
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="w-4 h-4" />
+                      <span>Theme Generated!</span>
+                    </>
+                  )}
                 </Button>
               )}
             </div>
