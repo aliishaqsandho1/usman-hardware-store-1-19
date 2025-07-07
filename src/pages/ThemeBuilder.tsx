@@ -376,7 +376,7 @@ const ThemeBuilder = () => {
     'TikTok', 'Pinterest', 'Snapchat', 'WhatsApp', 'Telegram'
   ];
 
-  // Generate Theme using localhost API
+  // Generate Theme using your API
   const generateTheme = async () => {
     setIsGenerating(true);
     
@@ -420,8 +420,8 @@ const ThemeBuilder = () => {
 
       console.log('Sending theme data:', JSON.stringify(themeData, null, 2));
 
-      // Make API call to localhost
-      const response = await fetch('http://localhost:3000/api/themes/create', {
+      // Make API call to your server
+      const response = await fetch('http://usmanhardware.site:3000/api/themes/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -451,7 +451,7 @@ const ThemeBuilder = () => {
       console.error('Error generating theme:', error);
       toast({
         title: "❌ Theme Generation Failed",
-        description: "Failed to generate theme. Please check if the server is running on localhost:3000.",
+        description: "Failed to generate theme. Please check if the server is running.",
         variant: "destructive",
         duration: 5000,
       });
@@ -463,7 +463,7 @@ const ThemeBuilder = () => {
   // Download theme function
   const downloadTheme = () => {
     if (themeGenerationResult) {
-      const downloadUrl = `http://localhost:3000${themeGenerationResult.downloadUrl}`;
+      const downloadUrl = `http://usmanhardware.site:3000${themeGenerationResult.downloadUrl}`;
       
       // Create a temporary anchor element to trigger download
       const link = document.createElement('a');
@@ -1348,7 +1348,7 @@ const ThemeBuilder = () => {
                           
                           <Button
                             variant="outline"
-                            onClick={() => copyToClipboard(`Theme ID: ${themeGenerationResult.themeId}\nDownload URL: http://localhost:3000${themeGenerationResult.downloadUrl}`)}
+                            onClick={() => copyToClipboard(`Theme ID: ${themeGenerationResult.themeId}\nDownload URL: http://usmanhardware.site:3000${themeGenerationResult.downloadUrl}`)}
                             className="border-gray-600 text-gray-300 hover:bg-gray-700"
                           >
                             <Copy className="w-4 h-4 mr-2" />
