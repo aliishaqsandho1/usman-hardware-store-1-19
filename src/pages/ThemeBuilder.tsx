@@ -13,7 +13,8 @@ import { Badge } from '@/components/ui/badge';
 import { 
   ArrowRight, ArrowLeft, Palette, Type, Frame, Globe, 
   MessageCircle, Bot, Magnet, User, Loader2, CheckCircle,
-  Copy, Eye, Download
+  Copy, Eye, Download, Star, Package, Shield, Zap,
+  Search, X
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -635,8 +636,45 @@ const ThemeBuilder = () => {
     return acc;
   }, {} as Record<string, typeof features>);
 
+  // Get category icons
+  const getCategoryIcon = (category: string) => {
+    const iconMap: Record<string, any> = {
+      'Core': Star,
+      'Content': MessageCircle,
+      'Media': Frame,
+      'Social': Globe,
+      'Marketing': Magnet,
+      'E-commerce': Package,
+      'Interactive': Zap,
+      'Analytics': Bot,
+      'Advanced': Bot,
+      'Performance': Bot,
+      'Technical': Bot,
+      'Security': Shield,
+      'Legal': User,
+      'Education': User,
+      'Real Estate': Magnet,
+      'Finance': Bot,
+      'Food Service': Frame,
+      'Healthcare': User,
+      'Health & Fitness': User,
+      'Events': Frame,
+      'Non-profit': Magnet,
+      'Business': Frame,
+      'Accessibility': Globe
+    };
+    return iconMap[category] || Package;
+  };
+
+  // Remove feature function
+  const removeFeature = (featureName: string) => {
+    setFormData(prev => ({
+      ...prev,
+      selectedFeatures: prev.selectedFeatures.filter(f => f !== featureName)
+    }));
+  };
+
   return (
-    
     <div className="min-h-screen bg-gray-950 py-20 px-4">
       <Navbar />
       <div className="max-w-6xl mx-auto">
@@ -961,90 +999,276 @@ const ThemeBuilder = () => {
               </div>
             )}
 
-            {/* Step 3: Features & Functionality */}
+            {/* Step 3: Features & Functionality - ENHANCED UI */}
             {currentStep === 3 && (
-              <div className="space-y-6">
-                <div className="text-center mb-6">
-                  <h3 className="text-lg font-semibold mb-2 text-white">Select the features you need for your website</h3>
-                  <p className="text-gray-400">Choose from our comprehensive list of features organized by category</p>
+              <div className="space-y-8">
+                {/* Header Section */}
+                <div className="text-center space-y-4">
+                  <div className="flex items-center justify-center gap-3 mb-4">
+                    <div className="p-3 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full">
+                      <Package className="w-8 h-8 text-blue-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-white">Choose Your Website Features</h3>
+                      <p className="text-gray-400">Select from our comprehensive collection of powerful features</p>
+                    </div>
+                  </div>
+                  
+                  {/* Feature Count Badge */}
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full border border-blue-500/20">
+                    <CheckCircle className="w-4 h-4 text-green-400" />
+                    <span className="text-sm font-medium text-white">
+                      {formData.selectedFeatures.length} features selected
+                    </span>
+                  </div>
                 </div>
 
-                <Tabs defaultValue="Core" className="w-full">
-                  <TabsList className="flex w-full overflow-x-auto whitespace-nowrap gap-2 bg-gray-800">
-                    {Object.keys(groupedFeatures).slice(0, 8).map((category) => (
-                      <TabsTrigger key={category} value={category} className="text-xs data-[state=active]:bg-blue-600">
-                        {category}
-                      </TabsTrigger>
-                    ))}
-                  </TabsList>
+                {/* Main Feature Categories */}
+                <div className="bg-gradient-to-r from-gray-800/50 to-gray-900/50 rounded-xl p-6 border border-gray-700">
+                  <h4 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
+                    <Star className="w-5 h-5 text-yellow-400" />
+                    Popular Categories
+                  </h4>
                   
-                  {Object.entries(groupedFeatures).slice(0, 8).map(([category, features]) => (
-                    <TabsContent key={category} value={category} className="mt-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                        {features.map((feature) => (
-                          <div key={feature.name} className="flex items-center space-x-3 p-3 border border-gray-700 rounded-lg hover:bg-gray-800/50 bg-gray-900/50">
-                            <Checkbox
-                              id={feature.name}
-                              checked={formData.selectedFeatures.includes(feature.name)}
-                              onCheckedChange={() => handleCheckboxChange('selectedFeatures', feature.name)}
-                            />
-                            <feature.icon size={16} className="text-blue-400" />
-                            <Label htmlFor={feature.name} className="text-sm font-medium cursor-pointer flex-1 text-white">
-                              {feature.name}
-                            </Label>
-                          </div>
-                        ))}
-                      </div>
-                    </TabsContent>
-                  ))}
-                </Tabs>
-
-                {/* Additional Categories */}
-                <div className="mt-8">
-                  <h4 className="text-md font-semibold mb-4 text-white">Additional Categories</h4>
-                  <Tabs defaultValue={Object.keys(groupedFeatures)[8]} className="w-full">
-                    <TabsList className="flex w-full overflow-x-auto whitespace-nowrap gap-2 bg-gray-800">
-                      {Object.keys(groupedFeatures).slice(8).map((category) => (
-                        <TabsTrigger key={category} value={category} className="text-xs data-[state=active]:bg-blue-600">
-                          {category}
-                        </TabsTrigger>
-                      ))}
+                  <Tabs defaultValue="Core" className="w-full">
+                    <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 gap-1 bg-gray-800/50 p-1 rounded-lg">
+                      {Object.keys(groupedFeatures).slice(0, 8).map((category) => {
+                        const Icon = getCategoryIcon(category);
+                        const featuresInCategory = groupedFeatures[category].length;
+                        const selectedInCategory = formData.selectedFeatures.filter(f => 
+                          groupedFeatures[category].some(feature => feature.name === f)
+                        ).length;
+                        
+                        return (
+                          <TabsTrigger 
+                            key={category} 
+                            value={category} 
+                            className="flex flex-col items-center gap-1 p-3 text-xs data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white relative"
+                          >
+                            <Icon className="w-4 h-4" />
+                            <span className="font-medium">{category}</span>
+                            <span className="text-xs opacity-70">({featuresInCategory})</span>
+                            {selectedInCategory > 0 && (
+                              <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                                {selectedInCategory}
+                              </div>
+                            )}
+                          </TabsTrigger>
+                        );
+                      })}
                     </TabsList>
                     
-                    {Object.entries(groupedFeatures).slice(8).map(([category, features]) => (
+                    {Object.entries(groupedFeatures).slice(0, 8).map(([category, categoryFeatures]) => (
                       <TabsContent key={category} value={category} className="mt-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                          {features.map((feature) => (
-                            <div key={feature.name} className="flex items-center space-x-3 p-3 border border-gray-700 rounded-lg hover:bg-gray-800/50 bg-gray-900/50">
-                              <Checkbox
-                                id={feature.name}
-                                checked={formData.selectedFeatures.includes(feature.name)}
-                                onCheckedChange={() => handleCheckboxChange('selectedFeatures', feature.name)}
-                              />
-                              <feature.icon size={16} className="text-blue-400" />
-                              <Label htmlFor={feature.name} className="text-sm font-medium cursor-pointer flex-1 text-white">
-                                {feature.name}
-                              </Label>
-                            </div>
-                          ))}
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                          {categoryFeatures.map((feature) => {
+                            const isSelected = formData.selectedFeatures.includes(feature.name);
+                            return (
+                              <div 
+                                key={feature.name} 
+                                className={`group relative overflow-hidden rounded-lg border-2 transition-all duration-300 cursor-pointer hover:scale-105 ${
+                                  isSelected 
+                                    ? 'border-blue-500 bg-gradient-to-r from-blue-500/10 to-purple-500/10 shadow-lg shadow-blue-500/20' 
+                                    : 'border-gray-700 bg-gray-800/30 hover:border-gray-600 hover:bg-gray-800/50'
+                                }`}
+                                onClick={() => handleCheckboxChange('selectedFeatures', feature.name)}
+                              >
+                                {/* Background gradient overlay */}
+                                <div className={`absolute inset-0 opacity-0 transition-opacity duration-300 ${
+                                  isSelected ? 'opacity-100' : 'group-hover:opacity-30'
+                                } bg-gradient-to-br from-blue-500/5 to-purple-500/5`} />
+                                
+                                <div className="relative p-4 flex items-center gap-3">
+                                  <Checkbox
+                                    id={feature.name}
+                                    checked={isSelected}
+                                    className="data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
+                                    readOnly
+                                  />
+                                  
+                                  <div className={`p-2 rounded transition-colors ${
+                                    isSelected ? 'bg-blue-500/20' : 'bg-gray-700/50'
+                                  }`}>
+                                    <feature.icon className={`w-5 h-5 ${
+                                      isSelected ? 'text-blue-400' : 'text-gray-400'
+                                    }`} />
+                                  </div>
+                                  
+                                  <div className="flex-1 min-w-0">
+                                    <Label 
+                                      htmlFor={feature.name} 
+                                      className="text-sm font-medium cursor-pointer text-white block leading-tight"
+                                    >
+                                      {feature.name}
+                                    </Label>
+                                    <span className="text-xs text-gray-500 mt-1 block">
+                                      {category}
+                                    </span>
+                                  </div>
+                                  
+                                  {isSelected && (
+                                    <div className="absolute top-2 right-2">
+                                      <CheckCircle className="w-4 h-4 text-green-400" />
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
                       </TabsContent>
                     ))}
                   </Tabs>
                 </div>
 
-                <div className="mt-6 p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
-                  <h4 className="font-semibold text-blue-400 mb-2">Selected Features</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {formData.selectedFeatures.map((feature) => (
-                      <Badge key={feature} variant="secondary" className="bg-blue-500/20 text-blue-300">
-                        {feature}
-                      </Badge>
-                    ))}
-                    {formData.selectedFeatures.length === 0 && (
-                      <p className="text-gray-400 text-sm">No features selected yet</p>
+                {/* Specialized Categories */}
+                {Object.keys(groupedFeatures).length > 8 && (
+                  <div className="bg-gradient-to-r from-gray-800/30 to-gray-900/30 rounded-xl p-6 border border-gray-700/50">
+                    <h4 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
+                      <Zap className="w-5 h-5 text-purple-400" />
+                      Specialized Features
+                    </h4>
+                    
+                    <Tabs defaultValue={Object.keys(groupedFeatures)[8]} className="w-full">
+                      <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-1 bg-gray-800/30 p-1 rounded-lg">
+                        {Object.keys(groupedFeatures).slice(8).map((category) => {
+                          const Icon = getCategoryIcon(category);
+                          const featuresInCategory = groupedFeatures[category].length;
+                          const selectedInCategory = formData.selectedFeatures.filter(f => 
+                            groupedFeatures[category].some(feature => feature.name === f)
+                          ).length;
+                          
+                          return (
+                            <TabsTrigger 
+                              key={category} 
+                              value={category} 
+                              className="flex flex-col items-center gap-1 p-2 text-xs data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white relative"
+                            >
+                              <Icon className="w-3 h-3" />
+                              <span className="font-medium text-xs">{category}</span>
+                              <span className="text-xs opacity-60">({featuresInCategory})</span>
+                              {selectedInCategory > 0 && (
+                                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                                  {selectedInCategory}
+                                </div>
+                              )}
+                            </TabsTrigger>
+                          );
+                        })}
+                      </TabsList>
+                      
+                      {Object.entries(groupedFeatures).slice(8).map(([category, categoryFeatures]) => (
+                        <TabsContent key={category} value={category} className="mt-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                            {categoryFeatures.map((feature) => {
+                              const isSelected = formData.selectedFeatures.includes(feature.name);
+                              return (
+                                <div 
+                                  key={feature.name} 
+                                  className={`group relative overflow-hidden rounded-lg border transition-all duration-200 cursor-pointer hover:scale-102 ${
+                                    isSelected 
+                                      ? 'border-purple-500 bg-gradient-to-r from-purple-500/10 to-pink-500/10' 
+                                      : 'border-gray-700/50 bg-gray-800/20 hover:border-gray-600'
+                                  }`}
+                                  onClick={() => handleCheckboxChange('selectedFeatures', feature.name)}
+                                >
+                                  <div className="p-3 flex items-center gap-3">
+                                    <Checkbox
+                                      id={feature.name}
+                                      checked={isSelected}
+                                      className="data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
+                                      readOnly
+                                    />
+                                    
+                                    <div className={`p-1.5 rounded transition-colors ${
+                                      isSelected ? 'bg-purple-500/20' : 'bg-gray-700/30'
+                                    }`}>
+                                      <feature.icon className={`w-4 h-4 ${
+                                        isSelected ? 'text-purple-400' : 'text-gray-500'
+                                      }`} />
+                                    </div>
+                                    
+                                    <div className="flex-1">
+                                      <Label 
+                                        htmlFor={feature.name} 
+                                        className="text-sm font-medium cursor-pointer text-white"
+                                      >
+                                        {feature.name}
+                                      </Label>
+                                    </div>
+                                    
+                                    {isSelected && (
+                                      <CheckCircle className="w-4 h-4 text-green-400" />
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </TabsContent>
+                      ))}
+                    </Tabs>
+                  </div>
+                )}
+
+                {/* Selected Features Summary */}
+                <div className="bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-xl p-6 border border-blue-500/20">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="text-xl font-semibold text-blue-400 flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5" />
+                      Selected Features ({formData.selectedFeatures.length})
+                    </h4>
+                    {formData.selectedFeatures.length > 0 && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setFormData(prev => ({ ...prev, selectedFeatures: [] }))}
+                        className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+                      >
+                        Clear All
+                      </Button>
                     )}
                   </div>
+                  
+                  {formData.selectedFeatures.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {formData.selectedFeatures.map((featureName) => {
+                        const feature = features.find(f => f.name === featureName);
+                        if (!feature) return null;
+                        
+                        return (
+                          <div 
+                            key={featureName} 
+                            className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg border border-blue-500/20 group hover:from-blue-500/15 hover:to-purple-500/15 transition-all"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="p-1.5 bg-blue-500/20 rounded">
+                                <feature.icon className="w-4 h-4 text-blue-400" />
+                              </div>
+                              <div>
+                                <span className="text-sm font-medium text-white">{featureName}</span>
+                                <div className="text-xs text-gray-400">{feature.category}</div>
+                              </div>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => removeFeature(featureName)}
+                              className="w-6 h-6 p-0 border-red-500/50 text-red-400 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all"
+                            >
+                              <X className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <Package className="w-12 h-12 text-gray-600 mx-auto mb-3" />
+                      <p className="text-gray-400 text-lg font-medium">No features selected yet</p>
+                      <p className="text-gray-500 text-sm mt-1">Choose features from the categories above to get started</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -1143,7 +1367,7 @@ const ThemeBuilder = () => {
               </div>
             )}
 
-            {/* Step 5: Final Details with Theme Generation */}
+            {/* Step 5: Final Details */}
             {currentStep === 5 && (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1534,9 +1758,7 @@ const ThemeBuilder = () => {
           </CardContent>
         </Card>
       </div>
-      
     </div>
-    
   );
 };
 
