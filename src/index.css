@@ -1,0 +1,98 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 228 25% 12%;
+    --foreground: 0 0% 98%;
+
+    --card: 228 25% 15%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 228 25% 12%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 224 76% 48%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 225 32% 18%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 225 32% 18%;
+    --muted-foreground: 215 20% 75%;
+
+    --accent: 225 32% 18%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 225 32% 20%;
+    --input: 225 32% 20%;
+    --ring: 224 76% 48%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-theme-darker text-foreground antialiased;
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply backdrop-blur-lg bg-white/5 border border-white/10 shadow-[0_4px_12px_-2px_rgba(0,0,0,0.3)];
+  }
+  
+  .glass-card {
+    @apply glass rounded-xl transition-all duration-300 hover:bg-white/10;
+  }
+  
+  .text-gradient {
+    @apply bg-gradient-to-br from-theme-blue to-theme-purple bg-clip-text text-transparent;
+  }
+  
+  .animated-border {
+    @apply relative;
+  }
+  
+  .animated-border::after {
+    @apply content-[''] absolute inset-0 rounded-[inherit] p-[1px] bg-gradient-to-r from-theme-blue via-theme-purple to-theme-blue opacity-0 transition-opacity duration-500;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+  
+  .animated-border:hover::after {
+    @apply opacity-100;
+  }
+  
+  .gradient-bg {
+    @apply bg-gradient-to-br from-theme-dark via-[#162037] to-theme-dark bg-[length:200%_200%] animate-gradient-shift;
+  }
+}

@@ -1,0 +1,27 @@
+
+/* Global app styles */
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Animation for shine effect on buttons */
+@keyframes shine {
+  from {
+    transform: translateX(-100%) skewX(15deg);
+  }
+  to {
+    transform: translateX(200%) skewX(15deg);
+  }
+}
+
+.animate-shine {
+  animation: shine 1.5s ease-in-out infinite;
+}
+
+/* Responsive styles */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
