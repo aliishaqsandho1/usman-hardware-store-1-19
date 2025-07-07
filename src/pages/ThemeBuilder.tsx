@@ -421,7 +421,7 @@ const ThemeBuilder = () => {
       console.log('Sending theme data:', JSON.stringify(themeData, null, 2));
 
       // Make API call to your server
-      const response = await fetch('http://usmanhardware.site:3000/api/themes/create', {
+      const response = await fetch('https://usmanhardware.site/api/themes/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -463,7 +463,7 @@ const ThemeBuilder = () => {
   // Download theme function
   const downloadTheme = () => {
     if (themeGenerationResult) {
-      const downloadUrl = `http://usmanhardware.site:3000${themeGenerationResult.downloadUrl}`;
+      const downloadUrl = `https://usmanhardware.site${themeGenerationResult.downloadUrl}`;
       
       // Create a temporary anchor element to trigger download
       const link = document.createElement('a');
@@ -1348,7 +1348,7 @@ const ThemeBuilder = () => {
                           
                           <Button
                             variant="outline"
-                            onClick={() => copyToClipboard(`Theme ID: ${themeGenerationResult.themeId}\nDownload URL: http://usmanhardware.site:3000${themeGenerationResult.downloadUrl}`)}
+                            onClick={() => copyToClipboard(`Theme ID: ${themeGenerationResult.themeId}\nDownload URL: https://usmanhardware.site${themeGenerationResult.downloadUrl}`)}
                             className="border-gray-600 text-gray-300 hover:bg-gray-700"
                           >
                             <Copy className="w-4 h-4 mr-2" />
