@@ -53,6 +53,9 @@ const ThemeBuilder = () => {
     // Content Sections
     contentSections: [] as string[],
     
+    // Selected Modules - NEW FIELD
+    selectedModules: [] as string[],
+    
     // Business Details
     businessDescription: '',
     goals: '',
@@ -376,6 +379,22 @@ const ThemeBuilder = () => {
     'TikTok', 'Pinterest', 'Snapchat', 'WhatsApp', 'Telegram'
   ];
 
+  // Available modules based on your image
+  const availableModules = [
+    { name: 'blog', displayName: 'Blog', description: 'Blog posts and articles' },
+    { name: 'contact', displayName: 'Contact', description: 'Contact forms and information' },
+    { name: 'cta', displayName: 'Call to Action', description: 'Call-to-action sections' },
+    { name: 'events', displayName: 'Events', description: 'Event listings and calendar' },
+    { name: 'faq', displayName: 'FAQ', description: 'Frequently asked questions' },
+    { name: 'gallery', displayName: 'Gallery', description: 'Image and media galleries' },
+    { name: 'newsletter', displayName: 'Newsletter', description: 'Newsletter signup forms' },
+    { name: 'portfolio', displayName: 'Portfolio', description: 'Portfolio showcase' },
+    { name: 'pricing', displayName: 'Pricing', description: 'Pricing tables and plans' },
+    { name: 'services', displayName: 'Services', description: 'Services and offerings' },
+    { name: 'team', displayName: 'Team', description: 'Team member profiles' },
+    { name: 'testimonials', displayName: 'Testimonials', description: 'Customer testimonials' }
+  ];
+
   // Generate Theme using your API
   const generateTheme = async () => {
     setIsGenerating(true);
@@ -415,7 +434,8 @@ const ThemeBuilder = () => {
           contactInfo: formData.contactInfo,
           socialMedia: formData.socialMedia,
           additionalRequirements: formData.additionalRequirements
-        }
+        },
+        selectedModules: formData.selectedModules // NEW: Include selected modules
       };
 
       console.log('Sending theme data:', JSON.stringify(themeData, null, 2));
@@ -436,6 +456,7 @@ const ThemeBuilder = () => {
       const result = await response.json();
       console.log('Theme generation result:', result);
 
+      // Updated to handle the new API response format
       setThemeGenerationResult({
         themeId: result.themeId,
         downloadUrl: result.downloadUrl
@@ -602,7 +623,7 @@ const ThemeBuilder = () => {
     }));
   };
 
-  const handleCheckboxChange = (field: 'selectedFeatures' | 'contentSections' | 'socialMedia', value: string) => {
+  const handleCheckboxChange = (field: 'selectedFeatures' | 'contentSections' | 'socialMedia' | 'selectedModules', value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: prev[field].includes(value)
@@ -1049,7 +1070,7 @@ const ThemeBuilder = () => {
               </div>
             )}
 
-            {/* Step 4: Layout & Structure */}
+            {/* Step 4: Layout & Structure + Module Selection */}
             {currentStep === 4 && (
               <div className="space-y-8">
                 <div>
@@ -1138,6 +1159,52 @@ const ThemeBuilder = () => {
                         </Label>
                       </div>
                     ))}
+                  </div>
+                </div>
+
+                {/* NEW: Module Selection */}
+                <div>
+                  <Label className="text-base font-semibold mb-4 block text-white">Select Modules *</Label>
+                  <p className="text-gray-400 text-sm mb-4">Choose the specific modules you want to include in your theme</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {availableModules.map((module) => (
+                      <div
+                        key={module.name}
+                        className={`p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md ${
+                          formData.selectedModules.includes(module.name) 
+                            ? 'border-blue-500 bg-blue-500/10' 
+                            : 'border-gray-700 bg-gray-800/50'
+                        }`}
+                        onClick={() => handleCheckboxChange('selectedModules', module.name)}
+                      >
+                        <div className="flex items-center space-x-3">
+                          <Checkbox
+                            id={module.name}
+                            checked={formData.selectedModules.includes(module.name)}
+                            onCheckedChange={() => handleCheckboxChange('selectedModules', module.name)}
+                          />
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-sm text-white">{module.displayName}</h3>
+                            <p className="text-xs text-gray-400 mt-1">{module.description}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Selected Modules Summary */}
+                  <div className="mt-4 p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                    <h4 className="font-semibold text-blue-400 mb-2">Selected Modules</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {formData.selectedModules.map((module) => (
+                        <Badge key={module} variant="secondary" className="bg-blue-500/20 text-blue-300">
+                          {availableModules.find(m => m.name === module)?.displayName || module}
+                        </Badge>
+                      ))}
+                      {formData.selectedModules.length === 0 && (
+                        <p className="text-gray-400 text-sm">No modules selected yet</p>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
